@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react'
 interface ChatAreaProps {
   messages: Message[]
   isLoading: boolean
-  messagesEndRef: React.RefObject<HTMLDivElement>
+  messagesEndRef: React.RefObject<HTMLDivElement | null>
   onSuggestionClick: (suggestion: string) => void
 }
 

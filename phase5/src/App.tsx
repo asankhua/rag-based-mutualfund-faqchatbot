@@ -22,7 +22,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [funds, setFunds] = useState<Fund[]>([])
   const [selectedFund, setSelectedFund] = useState<string | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   // Fetch funds on mount
   useEffect(() => {
