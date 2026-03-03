@@ -1,6 +1,6 @@
 import type { ChatQueryRequest, ChatQueryResponse, FundListResponse, SystemStatus } from './types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-url.onrender.com'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://rag-based-mutualfund-faqchatbot.onrender.com'
 
 export async function sendChatQuery(message: string): Promise<ChatQueryResponse> {
   const request: ChatQueryRequest = { message }
