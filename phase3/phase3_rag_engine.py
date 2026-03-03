@@ -247,12 +247,13 @@ CRITICAL RULES:
 4. NEVER answer personal/account-specific questions (portfolio, KYC, login, etc.).
 5. ALWAYS include a "Sources" section with URLs from the context.
 6. Be concise and factual. Do not make predictions about future performance.
+7. IMPORTANT: Deduplicate source URLs - list each unique URL only once in the Sources section.
 
 For opinionated/advisory questions, politely refuse and explain that you are a facts-only assistant.
 
 Response format:
 - Provide a clear, factual answer based on the context
-- End with a "Sources" section listing the URLs
+- End with a "Sources" section listing unique URLs (no duplicates)
 """
 
     # Refusal response for advisory queries
@@ -330,6 +331,9 @@ Sources:
             if "Sources:" not in answer:
                 sources = self._extract_sources(context_chunks)
                 answer += f"\n\nSources:\n{sources}"
+            else:
+                # Deduplicate sources in the answer
+                answer = self._deduplicate_sources_in_answer(answer)
             
             return answer
             
@@ -359,6 +363,36 @@ Sources:
             sources.add("- https://www.indmoney.com/mutual-funds")
         
         return "\n".join(sorted(sources))
+    
+    def _deduplicate_sources_in_answer(self, answer: str) -> str:
+        """Deduplicate sources in the LLM-generated answer."""
+        # Split answer into content and sources
+        if "Sources:" not in answer:
+            return answer
+        
+        parts = answer.split("Sources:", 1)
+        content = parts[0].strip()
+        sources_section = parts[1].strip()
+        
+        # Extract unique sources
+        seen = set()
+        unique_sources = []
+        
+        for line in sources_section.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            # Normalize the URL (remove bullet points, etc.)
+            url = line.lstrip("- ").strip()
+            if url and url not in seen:
+                seen.add(url)
+                unique_sources.append(f"- {url}")
+        
+        # Rebuild answer with deduplicated sources
+        if unique_sources:
+            return f"{content}\n\nSources:\n" + "\n".join(unique_sources)
+        else:
+            return content
 
 
 class RAGPipeline:
