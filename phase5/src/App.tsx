@@ -23,12 +23,36 @@ function App() {
   const [funds, setFunds] = useState<Fund[]>([])
   const [selectedFund, setSelectedFund] = useState<string | null>(null)
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
+  const [isLoadingData, setIsLoadingData] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   // Fetch funds and system status on mount
   useEffect(() => {
-    fetchFunds().then(setFunds).catch(console.error)
-    fetchStatus().then(setSystemStatus).catch(console.error)
+    const loadData = async () => {
+      setIsLoadingData(true)
+      setError(null)
+      
+      try {
+        const fundsData = await fetchFunds()
+        setFunds(fundsData)
+      } catch (err) {
+        console.error('Failed to fetch funds:', err)
+        setError('Failed to connect to backend API. Please check your connection.')
+        setFunds([])
+      }
+      
+      try {
+        const statusData = await fetchStatus()
+        setSystemStatus(statusData)
+      } catch (err) {
+        console.error('Failed to fetch status:', err)
+      }
+      
+      setIsLoadingData(false)
+    }
+    
+    loadData()
   }, [])
 
   // Auto-scroll to bottom
@@ -96,8 +120,21 @@ function App() {
   const lastAssistantMessage = [...messages].reverse().find((m) => m.role === 'assistant')
   const currentSources = lastAssistantMessage?.sources || []
 
+  if (isLoadingData) {
+    return (
+      <div className="app" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#1a1d29', color: 'white' }}>
+        <div>Loading...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="app">
+      {error && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: '#ef4444', color: 'white', padding: '12px', textAlign: 'center', zIndex: 1000 }}>
+          {error}
+        </div>
+      )}
       <Sidebar
         funds={funds}
         selectedFund={selectedFund}
