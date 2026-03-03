@@ -407,13 +407,17 @@ Suggested `embeddings` table schema (PostgreSQL with pgvector):
 
 - Keep fund data up to date automatically.
 - Orchestrate periodic re-scraping, re-chunking, and re-embedding.
+- Display last updated date on the UI to inform users of data freshness.
 
 ### Scheduler Design
 
-- **Options**:
-  - Cron jobs (server-level).
-  - A scheduler library (e.g., APScheduler in Python).
-  - Cloud-native schedulers (Cloud Scheduler, EventBridge, etc.).
+- **Implementation**: APScheduler (Python library) with BackgroundScheduler.
+- **Schedule**: Daily at 9:00 AM, Monday-Friday (IST timezone for Indian market).
+- **Components**:
+  - `PipelineScheduler`: Manages scheduled job execution using cron triggers.
+  - `PipelineOrchestrator`: Chains Phase 1 → Phase 2 pipeline execution.
+  - `HealthChecker`: Validates pipeline with canned queries after refresh.
+  - `PipelineMonitor`: Tracks metrics and generates alerts.
 
 ### Job Types
 
@@ -425,7 +429,8 @@ Suggested `embeddings` table schema (PostgreSQL with pgvector):
      - Iterate over allowlisted URLs.
      - Run Phase 1 scraping.
      - Compare with previous snapshot per scheme:
-       - If changes detected in key fields, mark scheme as “dirty/updated”.
+       - If changes detected in key fields, mark scheme as "dirty/updated".
+     - Backup existing data before scraping.
 
 2. **Rebuild Chunks & Embeddings Job**
    - For schemes marked as updated:
@@ -435,28 +440,50 @@ Suggested `embeddings` table schema (PostgreSQL with pgvector):
      - Optionally soft-delete or version old chunks.
 
 3. **Health Check / Smoke Test Job**
+   - Runs 30 minutes after the scrape job.
    - After each refresh cycle:
-     - Run a small set of canned queries (e.g., “What is the NAV of HDFC Flexi Cap Fund?”).
+     - Run a small set of canned queries (e.g., "What is the NAV of HDFC Flexi Cap Fund?").
      - Validate that answers:
        - Are non-empty.
        - Include source links.
-       - Show the correct “as on” dates when available.
+       - Show the correct "as on" dates when available.
+   - Saves detailed reports for troubleshooting.
 
 ### Trigger Chain
 
-- **Scheduler → Scraper (Phase 1) → Chunker + Embeddings (Phase 2)**.
+- **Scheduler → Scraper (Phase 1) → Chunker + Embeddings (Phase 2) → Health Check**.
 - Backend reads always from the **latest dataset** (e.g., by timestamp/version).
+
+### UI Integration - Last Updated Date
+
+The UI displays the last data update timestamp to inform users of data freshness:
+
+- **Backend** (`/status` endpoint):
+  - Returns `last_updated`: ISO timestamp of most recent scrape.
+  - Returns `data_freshness`: "fresh" (< 48 hours), "stale" (> 48 hours), or "unknown".
+  - Returns `total_funds`: Number of funds in the dataset.
+
+- **Frontend** (Header component):
+  - Fetches status on app mount via `fetchStatus()` API call.
+  - Displays formatted date (e.g., "Data updated: 3 Mar 2026, 09:15").
+  - Shows colored freshness indicator:
+    - Green dot: Data is fresh (< 48 hours).
+    - Yellow/Orange dot: Data is stale (> 48 hours).
+  - Located in the chat header below the assistant title.
 
 ### Monitoring & Alerts
 
-- Metrics:
+- Metrics (stored in `data/metrics/`):
   - Last successful scrape time per URL.
   - Number of chunks per scheme.
   - Embedding generation failures.
   - Average chat response latency.
+  - Pipeline run history (JSONL format).
 - Alerts:
   - Scrape failures.
   - Sudden reduction in chunks or missing data for any scheme (indicates layout changes or parsing errors).
+  - Health check test failures.
+  - Data freshness warnings (> 48 hours old).
 
 ---
 

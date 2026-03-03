@@ -134,6 +134,16 @@ class HealthResponse(BaseModel):
     version: str
 
 
+class StatusResponse(BaseModel):
+    """System status response with last update information."""
+    status: str
+    last_updated: Optional[str] = Field(None, description="ISO timestamp of last successful data update")
+    total_funds: int
+    data_freshness: str = Field(..., description="fresh, stale, or unknown")
+    scheduler_enabled: bool = True
+    timestamp: str
+
+
 # ============================================================================
 # API Endpoints
 # ============================================================================
@@ -156,6 +166,65 @@ async def health_check():
         timestamp=datetime.utcnow().isoformat() + "Z",
         version="1.0.0"
     )
+
+
+@app.get("/status", response_model=StatusResponse)
+async def get_status():
+    """
+    Get system status including last data update time.
+    
+    Returns information about data freshness and scheduler status.
+    """
+    try:
+        data_dir = Path(__file__).parent.parent / "data" / "phase1"
+        
+        last_updated = None
+        total_funds = 0
+        data_freshness = "unknown"
+        
+        if data_dir.exists():
+            scrape_times = []
+            
+            for json_file in data_dir.glob("*.json"):
+                try:
+                    with open(json_file, "r", encoding="utf-8") as f:
+                        fund_data = json.load(f)
+                    
+                    total_funds += 1
+                    scraped_at = fund_data.get("last_scraped_at")
+                    if scraped_at:
+                        scrape_times.append(datetime.fromisoformat(scraped_at.replace("Z", "+00:00")))
+                except Exception as e:
+                    logger.warning(f"Could not read {json_file}: {e}")
+            
+            if scrape_times:
+                # Use the most recent scrape time as last_updated
+                last_updated_dt = max(scrape_times)
+                last_updated = last_updated_dt.isoformat()
+                
+                # Determine freshness (fresh if within 48 hours)
+                now = datetime.utcnow()
+                age = now - last_updated_dt.replace(tzinfo=None)
+                if age.total_seconds() < 48 * 3600:
+                    data_freshness = "fresh"
+                else:
+                    data_freshness = "stale"
+        
+        return StatusResponse(
+            status="healthy",
+            last_updated=last_updated,
+            total_funds=total_funds,
+            data_freshness=data_freshness,
+            scheduler_enabled=True,
+            timestamp=datetime.utcnow().isoformat() + "Z"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error getting status: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting status: {str(e)}"
+        )
 
 
 # ----------------------------------------------------------------------------

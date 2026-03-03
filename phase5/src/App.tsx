@@ -5,8 +5,8 @@ import { ChatArea } from './components/ChatArea.tsx'
 import { SourcesPanel } from './components/SourcesPanel.tsx'
 import { ChatInput } from './components/ChatInput.tsx'
 import { Disclaimer } from './components/Disclaimer.tsx'
-import type { Message, Fund } from './types.ts'
-import { sendChatQuery, fetchFunds } from './api.ts'
+import type { Message, Fund, SystemStatus } from './types.ts'
+import { sendChatQuery, fetchFunds, fetchStatus } from './api.ts'
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([
@@ -22,11 +22,13 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [funds, setFunds] = useState<Fund[]>([])
   const [selectedFund, setSelectedFund] = useState<string | null>(null)
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
-  // Fetch funds on mount
+  // Fetch funds and system status on mount
   useEffect(() => {
     fetchFunds().then(setFunds).catch(console.error)
+    fetchStatus().then(setSystemStatus).catch(console.error)
   }, [])
 
   // Auto-scroll to bottom
@@ -111,6 +113,20 @@ function App() {
               <p>Factual information about HDFC mutual funds</p>
             </div>
           </div>
+          {systemStatus?.last_updated && (
+            <div className="last-updated">
+              <span className={`freshness-indicator ${systemStatus.data_freshness}`}></span>
+              <span className="update-text">
+                Data updated: {new Date(systemStatus.last_updated).toLocaleDateString('en-IN', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+          )}
         </header>
 
         <Disclaimer />

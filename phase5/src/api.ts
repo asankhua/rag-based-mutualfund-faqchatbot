@@ -1,4 +1,4 @@
-import type { ChatQueryRequest, ChatQueryResponse, FundListResponse } from './types'
+import type { ChatQueryRequest, ChatQueryResponse, FundListResponse, SystemStatus } from './types'
 
 const API_BASE_URL = 'http://localhost:8000'
 
@@ -39,6 +39,17 @@ export async function fetchFund(schemeId: string) {
   if (!response.ok) {
     const error = await response.json()
     throw new Error(error.detail || 'Failed to fetch fund')
+  }
+
+  return response.json()
+}
+
+export async function fetchStatus(): Promise<SystemStatus> {
+  const response = await fetch(`${API_BASE_URL}/status`)
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.detail || 'Failed to fetch status')
   }
 
   return response.json()

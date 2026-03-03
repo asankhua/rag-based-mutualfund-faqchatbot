@@ -58,3 +58,12 @@ export interface FundListResponse {
   funds: Fund[]
   total: number
 }
+
+export interface SystemStatus {
+  status: string
+  last_updated?: string
+  total_funds: number
+  data_freshness: 'fresh' | 'stale' | 'unknown'
+  scheduler_enabled: boolean
+  timestamp: string
+}
