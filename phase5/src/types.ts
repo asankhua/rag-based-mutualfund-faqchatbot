@@ -1,9 +1,6 @@
 export interface FundOverview {
   nav?: string
   returns_since_inception?: string
-  returns_1y?: string | null
-  returns_3y?: string | null
-  returns_5y?: string | null
   expense_ratio?: string
   benchmark?: string
   aum?: string
