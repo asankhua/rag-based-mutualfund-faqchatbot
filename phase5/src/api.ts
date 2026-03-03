@@ -5,20 +5,26 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://rag-based-mut
 export async function sendChatQuery(message: string): Promise<ChatQueryResponse> {
   const request: ChatQueryRequest = { message }
   
-  const response = await fetch(`${API_BASE_URL}/chat/query`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-  })
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat/query`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    })
 
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.detail || 'Failed to send message')
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('API Error:', response.status, errorText)
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
+    }
+
+    return response.json()
+  } catch (error) {
+    console.error('Fetch Error:', error)
+    throw error
   }
-
-  return response.json()
 }
 
 export async function fetchFunds(): Promise<FundListResponse['funds']> {

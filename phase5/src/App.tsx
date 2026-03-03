@@ -89,11 +89,12 @@ function App() {
       }
 
       setMessages((prev) => [...prev, assistantMessage])
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Chat error:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error processing your request. Please try again.',
+        content: `Error: ${error.message || 'Failed to connect to backend API. Please check if the backend is running.'}`,
         sources: [],
         timestamp: new Date().toISOString(),
         isError: true,
