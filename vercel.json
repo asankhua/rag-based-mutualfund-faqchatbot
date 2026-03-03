@@ -2,10 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    },
-    {
       "src": "phase5/package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -15,43 +11,8 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/docs",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/openapi.json",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/health",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/status",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/chat/query",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/funds",
-      "dest": "api/index.py"
-    },
-    {
-      "src": "/funds/(.*)",
-      "dest": "api/index.py"
-    },
-    {
       "src": "/(.*)",
       "dest": "/phase5/dist/$1"
     }
-  ],
-  "env": {
-    "PYTHONPATH": "."
-  }
+  ]
 }
