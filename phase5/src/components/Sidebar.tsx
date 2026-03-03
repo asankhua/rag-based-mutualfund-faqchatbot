@@ -1,4 +1,4 @@
-import type { Fund } from '../types'
+import type { Fund } from '../types.ts'
 import { Wallet, ChevronRight } from 'lucide-react'
 
 interface SidebarProps {

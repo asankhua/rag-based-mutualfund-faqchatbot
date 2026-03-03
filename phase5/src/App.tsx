@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
-import { Sidebar } from './components/Sidebar'
-import { ChatArea } from './components/ChatArea'
-import { SourcesPanel } from './components/SourcesPanel'
-import { ChatInput } from './components/ChatInput'
-import { Disclaimer } from './components/Disclaimer'
-import type { Message, Fund } from './types'
-import { sendChatQuery, fetchFunds } from './api'
+import { Sidebar } from './components/Sidebar.tsx'
+import { ChatArea } from './components/ChatArea.tsx'
+import { SourcesPanel } from './components/SourcesPanel.tsx'
+import { ChatInput } from './components/ChatInput.tsx'
+import { Disclaimer } from './components/Disclaimer.tsx'
+import type { Message, Fund } from './types.ts'
+import { sendChatQuery, fetchFunds } from './api.ts'
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([

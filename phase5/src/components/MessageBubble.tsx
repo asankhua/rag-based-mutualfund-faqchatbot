@@ -1,4 +1,4 @@
-import type { Message } from '../types'
+import type { Message } from '../types.ts'
 import { Info, AlertCircle } from 'lucide-react'
 
 interface MessageBubbleProps {

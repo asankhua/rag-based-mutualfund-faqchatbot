@@ -1,6 +1,6 @@
-import type { Message } from '../types'
-import { MessageBubble } from './MessageBubble'
-import { Suggestions } from './Suggestions'
+import type { Message } from '../types.ts'
+import { MessageBubble } from './MessageBubble.tsx'
+import { Suggestions } from './Suggestions.tsx'
 import { Loader2 } from 'lucide-react'
 
 interface ChatAreaProps {
