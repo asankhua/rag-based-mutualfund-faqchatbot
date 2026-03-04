@@ -136,12 +136,31 @@ async def health_check():
 @app.get("/status")
 async def get_status():
     data_dir = PROJECT_ROOT / "data" / "phase1"
-    total_funds = len(list(data_dir.glob("*.json"))) if data_dir.exists() else 0
+    total_funds = 0
+    last_updated = None
+    
+    if data_dir.exists():
+        scrape_times = []
+        for json_file in data_dir.glob("*.json"):
+            try:
+                with open(json_file, "r") as f:
+                    fund_data = json.load(f)
+                total_funds += 1
+                scraped_at = fund_data.get("last_scraped_at")
+                if scraped_at:
+                    scrape_times.append(datetime.fromisoformat(scraped_at.replace("Z", "+00:00")))
+            except:
+                pass
+        
+        if scrape_times:
+            last_updated_dt = max(scrape_times)
+            last_updated = last_updated_dt.isoformat()
     
     return {
         "status": "healthy",
         "total_funds": total_funds,
-        "data_freshness": "fresh",
+        "last_updated": last_updated,
+        "data_freshness": "fresh" if last_updated else "unknown",
         "timestamp": datetime.utcnow().isoformat() + "Z"
     }
 
@@ -215,13 +234,16 @@ Answer:"""
         
         answer = response.choices[0].message.content
         
-        # Extract sources from chunks
+        # Extract sources from chunks - get only the URL
+        import re
         sources = []
         for chunk in relevant_chunks:
-            if "Source:" in chunk:
-                source = chunk.split("Source:")[-1].strip()
-                if source and source not in sources:
-                    sources.append(source)
+            # Extract URL from Source: line
+            match = re.search(r'Source:\s*(https?://[^\s\n]+)', chunk)
+            if match:
+                url = match.group(1)
+                if url and url not in sources:
+                    sources.append(url)
         
         return ChatQueryResponse(answer=answer, sources=sources)
         
