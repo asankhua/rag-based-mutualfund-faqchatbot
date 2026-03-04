@@ -127,6 +127,12 @@ async def health_check():
     )
 
 
+@app.options("/{full_path:path}")
+async def preflight_handler(full_path: str):
+    """Handle CORS preflight requests."""
+    return {"status": "ok"}
+
+
 @app.get("/status", response_model=StatusResponse)
 async def get_status():
     try:
