@@ -45,12 +45,15 @@ def load_data():
     data_dir = PROJECT_ROOT / "data" / "phase2"
     
     with open(data_dir / "chunks.json", "r") as f:
-        chunks = json.load(f)
+        chunk_objects = json.load(f)
     
     with open(data_dir / "metadata.json", "r") as f:
         metadata = json.load(f)
     
     embeddings = np.load(data_dir / "embeddings.npy")
+    
+    # Extract text from chunk objects
+    chunks = [chunk["text"] for chunk in chunk_objects if "text" in chunk]
     
     return chunks, embeddings, metadata
 
