@@ -62,6 +62,8 @@ export interface FundListResponse {
 export interface SystemStatus {
   status: string
   last_updated?: string
+  last_scheduler_run?: string
+  last_data_update?: string
   total_funds: number
   data_freshness: 'fresh' | 'stale' | 'unknown'
   scheduler_enabled: boolean

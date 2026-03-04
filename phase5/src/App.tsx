@@ -151,11 +151,11 @@ function App() {
               <p>Factual information about HDFC mutual funds</p>
             </div>
           </div>
-          {systemStatus?.last_updated && (
+          {(systemStatus?.last_scheduler_run || systemStatus?.last_updated) && (
             <div className="last-updated">
               <span className={`freshness-indicator ${systemStatus.data_freshness}`}></span>
               <span className="update-text">
-                Data updated: {new Date(systemStatus.last_updated).toLocaleDateString('en-IN', {
+                Last updated: {new Date(systemStatus.last_scheduler_run || systemStatus.last_updated!).toLocaleDateString('en-IN', {
                   day: 'numeric',
                   month: 'short',
                   year: 'numeric',

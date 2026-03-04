@@ -2,15 +2,13 @@
 """
 Lightweight FastAPI backend for Render deployment.
 Uses pre-computed embeddings to avoid loading heavy ML models.
-Includes automatic daily scheduler for data updates.
+Data is updated via GitHub Actions scheduler.
 """
 
 import os
 import sys
 import json
 import numpy as np
-import asyncio
-import threading
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional, Dict, Any
@@ -23,11 +21,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from groq import Groq
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
-
-# Global variable to track last scheduler run
-LAST_SCHEDULER_RUN = None
 
 app = FastAPI(
     title="Mutual Fund FAQ Chatbot API",
@@ -141,10 +134,20 @@ async def health_check():
     )
 
 
+def get_scheduler_metadata():
+    """Read scheduler metadata from file."""
+    metadata_file = PROJECT_ROOT / "data" / "scheduler_metadata.json"
+    if metadata_file.exists():
+        try:
+            with open(metadata_file, "r") as f:
+                return json.load(f)
+        except:
+            pass
+    return {}
+
+
 @app.get("/status")
 async def get_status():
-    global LAST_SCHEDULER_RUN
-    
     data_dir = PROJECT_ROOT / "data" / "phase1"
     total_funds = 0
     last_data_update = None
@@ -165,16 +168,21 @@ async def get_status():
         if scrape_times:
             last_data_update = max(scrape_times).isoformat()
     
+    # Get scheduler metadata
+    scheduler_meta = get_scheduler_metadata()
+    last_scheduler_run = scheduler_meta.get("last_run")
+    
     # Use scheduler run time as the last_updated if available
-    display_last_updated = LAST_SCHEDULER_RUN or last_data_update
+    display_last_updated = last_scheduler_run or last_data_update
     
     return {
         "status": "healthy",
         "total_funds": total_funds,
         "last_updated": display_last_updated,
-        "last_scheduler_run": LAST_SCHEDULER_RUN,
+        "last_scheduler_run": last_scheduler_run,
         "last_data_update": last_data_update,
         "data_freshness": "fresh" if display_last_updated else "unknown",
+        "scheduler_enabled": True,
         "timestamp": datetime.utcnow().isoformat() + "Z"
     }
 
@@ -264,62 +272,6 @@ Answer:"""
     except Exception as e:
         print(f"Error in chat_query: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-def run_scheduler_task():
-    """Background task to run the full pipeline."""
-    global LAST_SCHEDULER_RUN, CHUNKS
-    
-    try:
-        print(f"[{datetime.now()}] Starting scheduled data update...")
-        
-        # Phase 1: Scrape data
-        print("Phase 1: Scraping fund data...")
-        from phase1.phase1_scraper import scrape_all_funds
-        scrape_all_funds()
-        
-        # Phase 2: Index data
-        print("Phase 2: Indexing fund data...")
-        from phase2.phase2_indexer import Phase2Indexer
-        indexer = Phase2Indexer()
-        indexer.index_all_funds()
-        indexer.vector_store.save()
-        
-        # Reload data in memory
-        print("Reloading data in memory...")
-        CHUNKS, _, _ = load_data()
-        
-        LAST_SCHEDULER_RUN = datetime.utcnow().isoformat() + "Z"
-        print(f"[{datetime.now()}] Scheduled update completed successfully!")
-        
-    except Exception as e:
-        print(f"[{datetime.now()}] Scheduler error: {e}")
-
-
-def start_scheduler():
-    """Start the background scheduler."""
-    scheduler = BackgroundScheduler()
-    
-    # Run daily at 9:00 AM UTC
-    trigger = CronTrigger(hour=9, minute=0)
-    
-    scheduler.add_job(
-        run_scheduler_task,
-        trigger=trigger,
-        id='daily_data_update',
-        name='Daily Fund Data Update',
-        replace_existing=True
-    )
-    
-    scheduler.start()
-    print(f"[{datetime.now()}] Scheduler started. Next run at 9:00 AM UTC.")
-    
-    # Run once on startup to ensure data is fresh
-    threading.Thread(target=run_scheduler_task, daemon=True).start()
-
-
-# Start scheduler when module loads
-start_scheduler()
 
 
 if __name__ == "__main__":
