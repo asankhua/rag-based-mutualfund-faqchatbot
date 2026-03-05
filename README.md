@@ -1,3 +1,5 @@
+https://github.com/asankhua/rag-based-mutualfund-faqchatbot/issues/2#issue-4027445941
+
 # RAG-Based Mutual Fund FAQ Chatbot
 
 A facts-only FAQ assistant for HDFC mutual funds on INDMoney. This chatbot provides factual information about mutual funds using a Retrieval-Augmented Generation (RAG) pipeline with Groq LLM.
