@@ -1,3 +1,7 @@
+https://github.com/user-attachments/assets/0ed06e44-1210-4b7a-93de-09b4a1292947
+
+
+
 [README.md](https://github.com/user-attachments/files/25764877/README.md)
 # RAG-Based Mutual Fund FAQ Chatbot
 
