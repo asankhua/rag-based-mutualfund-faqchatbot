@@ -3,14 +3,14 @@
   "name": "HDFC Nifty Private Bank ETF Fund",
   "source_url": "https://www.indmoney.com/mutual-funds/hdfc-nifty-private-bank-etf-1042349",
   "overview": {
-    "nav": "₹28.36 (as on 04 Mar 2026)",
-    "returns_since_inception": "175.41%/per year Since Inception",
+    "nav": "\u20b928.80 (as on 02 Mar 2026)",
+    "returns_since_inception": "177.15%/per year Since Inception",
     "returns_1y": null,
     "returns_3y": null,
     "returns_5y": null,
     "expense_ratio": "0.15%",
     "benchmark": "Nifty Private Bank TR INR",
-    "aum": "₹345 Cr",
+    "aum": "\u20b9345 Cr",
     "inception_date": "14 November, 2022",
     "min_lumpsum": null,
     "min_sip": null,
@@ -19,5 +19,5 @@
     "turnover": "45.91%",
     "risk": "Very High Risk"
   },
-  "last_scraped_at": "2026-03-05T10:27:34.037470Z"
+  "last_scraped_at": "2026-03-04T16:21:18.836589Z"
 }
