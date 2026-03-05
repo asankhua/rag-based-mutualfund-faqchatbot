@@ -1,4 +1,4 @@
-https://github.com/asankhua/rag-based-mutualfund-faqchatbot/issues/2#issue-4027445941
+https://github.com/user-attachments/assets/0ed06e44-1210-4b7a-93de-09b4a1292947
 
 # RAG-Based Mutual Fund FAQ Chatbot
 
