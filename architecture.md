@@ -411,13 +411,31 @@ Suggested `embeddings` table schema (PostgreSQL with pgvector):
 
 ### Scheduler Design
 
-- **Implementation**: APScheduler (Python library) with BackgroundScheduler.
-- **Schedule**: Daily at 9:00 AM, Monday-Friday (IST timezone for Indian market).
+- **Implementation**: GitHub Actions workflow (replaces local APScheduler for cloud deployment).
+- **Schedule**: Daily at 10:00 AM UTC via cron trigger.
+- **Location**: `.github/workflows/daily-scheduler.yml`
 - **Components**:
-  - `PipelineScheduler`: Manages scheduled job execution using cron triggers.
+  - GitHub Actions runner: Executes the workflow with full Python environment.
+  - `PipelineScheduler`: Manages scheduled job execution (Phase 6 module).
   - `PipelineOrchestrator`: Chains Phase 1 → Phase 2 pipeline execution.
   - `HealthChecker`: Validates pipeline with canned queries after refresh.
   - `PipelineMonitor`: Tracks metrics and generates alerts.
+
+### GitHub Actions Workflow
+
+- **File**: `.github/workflows/daily-scheduler.yml`
+- **Triggers**:
+  - Scheduled: Daily at 10:00 AM UTC (`cron: '0 10 * * *'`)
+  - Manual: `workflow_dispatch` for on-demand runs
+- **Steps**:
+  1. Checkout repository
+  2. Set up Python 3.11
+  3. Install system dependencies (Chromium browser)
+  4. Install Python dependencies (including sentence-transformers, playwright, apscheduler)
+  5. Run Phase 6 Scheduler (`python -m phase6.phase6_scheduler --run-once`)
+  6. Create `scheduler_metadata.json` with last run timestamp
+  7. Commit and push updated data to repository
+- **Secrets Required**: `GROQ_API_KEY` (set in GitHub repository settings)
 
 ### Job Types
 
@@ -456,20 +474,46 @@ Suggested `embeddings` table schema (PostgreSQL with pgvector):
 
 ### UI Integration - Last Updated Date
 
-The UI displays the last data update timestamp to inform users of data freshness:
+The UI displays the last scheduler run timestamp to inform users of data freshness:
 
 - **Backend** (`/status` endpoint):
-  - Returns `last_updated`: ISO timestamp of most recent scrape.
+  - Returns `last_updated`: ISO timestamp of most recent scheduler run (from `scheduler_metadata.json`).
+  - Returns `last_scheduler_run`: Timestamp when GitHub Actions scheduler last ran.
+  - Returns `last_data_update`: Timestamp from the most recent fund data file.
   - Returns `data_freshness`: "fresh" (< 48 hours), "stale" (> 48 hours), or "unknown".
   - Returns `total_funds`: Number of funds in the dataset.
+  - Reads `data/scheduler_metadata.json` created by GitHub Actions workflow.
 
 - **Frontend** (Header component):
   - Fetches status on app mount via `fetchStatus()` API call.
-  - Displays formatted date (e.g., "Data updated: 3 Mar 2026, 09:15").
+  - Displays formatted date (e.g., "Last updated: 4 Mar 2026, 10:15").
   - Shows colored freshness indicator:
     - Green dot: Data is fresh (< 48 hours).
     - Yellow/Orange dot: Data is stale (> 48 hours).
   - Located in the chat header below the assistant title.
+
+### Deployment Architecture
+
+- **Frontend (Vercel)**:
+  - React + TypeScript + Vite application.
+  - Static site deployment from `phase5/` directory.
+  - Environment variable: `VITE_API_BASE_URL` pointing to Render backend.
+
+- **Backend (Render)**:
+  - FastAPI application (`render_main.py`).
+  - Lightweight version without heavy ML dependencies.
+  - Uses pre-computed embeddings loaded from `data/phase2/`.
+  - Reads scheduler metadata from `data/scheduler_metadata.json`.
+  - Environment variable: `GROQ_API_KEY` for LLM queries.
+
+- **Data Flow**:
+  1. GitHub Actions scheduler runs daily at 10 AM UTC.
+  2. Scraper updates fund data in `data/phase1/`.
+  3. Indexer creates embeddings in `data/phase2/`.
+  4. Scheduler creates `data/scheduler_metadata.json` with timestamp.
+  5. Changes are committed and pushed to GitHub.
+  6. Render backend auto-deploys and loads new data.
+  7. Vercel frontend displays updated last run date.
 
 ### Monitoring & Alerts
 
