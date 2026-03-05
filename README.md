@@ -34,6 +34,7 @@ The system is divided into 6 phases:
 
 ### Backend (Render)
 - **URL**: https://rag-based-mutualfund-faqchatbot.onrender.com
+- **Health Check**: https://rag-based-mutualfund-faqchatbot.onrender.com/health
 - **Framework**: FastAPI (Python)
 - **Start Command**: `uvicorn render_main:app --host 0.0.0.0 --port $PORT`
 
