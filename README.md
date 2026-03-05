@@ -7,7 +7,6 @@ https://github.com/user-attachments/assets/0ed06e44-1210-4b7a-93de-09b4a1292947
 
 A facts-only FAQ assistant for HDFC mutual funds on INDMoney. This chatbot provides factual information about mutual funds using a Retrieval-Augmented Generation (RAG) pipeline with Groq LLM.
 
-![Chatbot Screenshot](https://via.placeholder.com/800x400?text=Chatbot+Screenshot)
 
 ## Features
 
