@@ -1,0 +1,180 @@
+{
+  "timestamp": "2026-03-05T10:27:39.737095Z",
+  "overall_status": "healthy",
+  "total_tests": 7,
+  "passed_tests": 7,
+  "failed_tests": 0,
+  "data_freshness": {
+    "status": "fresh",
+    "funds_checked": 8,
+    "fresh_funds": 8,
+    "stale_funds": 0,
+    "oldest_scrape": "2026-03-05T10:27:03.601075",
+    "newest_scrape": "2026-03-05T10:27:38.818598",
+    "details": [
+      {
+        "scheme_id": "hdfc-nifty-private-bank-etf-1042349",
+        "scraped_at": "2026-03-05T10:27:34.037470Z",
+        "age_hours": 0.0015833169444444445,
+        "is_fresh": true
+      },
+      {
+        "scheme_id": "hdfc-banking-financial-services-fund-direct-growth-1006661",
+        "scraped_at": "2026-03-05T10:27:24.561056Z",
+        "age_hours": 0.004215654166666667,
+        "is_fresh": true
+      },
+      {
+        "scheme_id": "hdfc-mid-cap-fund-direct-plan-growth-option-3097",
+        "scraped_at": "2026-03-05T10:27:19.297576Z",
+        "age_hours": 0.005677731944444444,
+        "is_fresh": true
+      },
+      {
+        "scheme_id": "hdfc-small-cap-fund-direct-growth-option-3580",
+        "scraped_at": "2026-03-05T10:27:09.089607Z",
+        "age_hours": 0.008513278888888889,
+        "is_fresh": true
+      },
+      {
+        "scheme_id": "hdfc-focused-fund-direct-plan-growth-option-2795",
+        "scraped_at": "2026-03-05T10:27:38.818598Z",
+        "age_hours": 0.0002552258333333333,
+        "is_fresh": true
+      },
+      {
+        "scheme_id": "hdfc-nifty-midcap-150-index-fund-direct-growth-1043788",
+        "scraped_at": "2026-03-05T10:27:14.546783Z",
+        "age_hours": 0.006997396666666667,
+        "is_fresh": true
+      },
+      {
+        "scheme_id": "hdfc-defence-fund-direct-growth-1043873",
+        "scraped_at": "2026-03-05T10:27:29.092920Z",
+        "age_hours": 0.002956803055555556,
+        "is_fresh": true
+      },
+      {
+        "scheme_id": "hdfc-flexi-cap-fund-direct-plan-growth-option-3184",
+        "scraped_at": "2026-03-05T10:27:03.601075Z",
+        "age_hours": 0.010037871111111112,
+        "is_fresh": true
+      }
+    ]
+  },
+  "errors": [],
+  "results": [
+    {
+      "test_name": "NAV Query - HDFC Flexi Cap",
+      "passed": true,
+      "query": "What is the NAV of HDFC Flexi Cap Fund?",
+      "answer": "The NAV (Net Asset Value) of HDFC Flexi Cap Fund as on 04 Mar 2026 is ₹2194.28.\n\nSources:\n- https://www.indmoney.com/mutual-funds/hdfc-flexi-cap-fund-direct-plan-growth-option-3184",
+      "sources": [
+        "https://www.indmoney.com/mutual-funds/hdfc-flexi-cap-fund-direct-plan-growth-option-3184"
+      ],
+      "error": null,
+      "response_time_ms": 1124.43208694458,
+      "metadata": {
+        "intent": "fund_fact",
+        "is_refusal": false,
+        "chunks_retrieved": 3
+      }
+    },
+    {
+      "test_name": "Expense Ratio Query - HDFC Small Cap",
+      "passed": true,
+      "query": "What is the expense ratio of HDFC Small Cap Fund?",
+      "answer": "The expense ratio of HDFC Small Cap Fund is 0.67%.\n\nSources:\n- https://www.indmoney.com/mutual-funds/hdfc-small-cap-fund-direct-growth-option-3580",
+      "sources": [
+        "https://www.indmoney.com/mutual-funds/hdfc-small-cap-fund-direct-growth-option-3580"
+      ],
+      "error": null,
+      "response_time_ms": 131.93583488464355,
+      "metadata": {
+        "intent": "fund_fact",
+        "is_refusal": false,
+        "chunks_retrieved": 2
+      }
+    },
+    {
+      "test_name": "Returns Query - HDFC Focused",
+      "passed": true,
+      "query": "What are the returns of HDFC Focused Fund?",
+      "answer": "The returns of HDFC Focused Fund are as follows:\n- Since Inception: 15.32%/per year\n\nSources:\n- https://www.indmoney.com/mutual-funds/hdfc-focused-fund-direct-plan-growth-option-2795",
+      "sources": [
+        "https://www.indmoney.com/mutual-funds/hdfc-focused-fund-direct-plan-growth-option-2795"
+      ],
+      "error": null,
+      "response_time_ms": 174.5891571044922,
+      "metadata": {
+        "intent": "fund_fact",
+        "is_refusal": false,
+        "chunks_retrieved": 2
+      }
+    },
+    {
+      "test_name": "Risk Query - HDFC Defence",
+      "passed": true,
+      "query": "What is the risk profile of HDFC Defence Fund?",
+      "answer": "The risk profile of HDFC Defence Fund is classified as \"Very High Risk\" by SEBI. This indicates that the fund may experience significant price fluctuations.\n\nSources:\n- https://www.indmoney.com/mutual-funds/hdfc-defence-fund-direct-growth-1043873",
+      "sources": [
+        "https://www.indmoney.com/mutual-funds/hdfc-defence-fund-direct-growth-1043873"
+      ],
+      "error": null,
+      "response_time_ms": 193.44639778137207,
+      "metadata": {
+        "intent": "fund_fact",
+        "is_refusal": false,
+        "chunks_retrieved": 5
+      }
+    },
+    {
+      "test_name": "AUM Query - HDFC Mid Cap",
+      "passed": true,
+      "query": "What is the AUM of HDFC Mid Cap Fund?",
+      "answer": "The Assets Under Management (AUM) of HDFC Mid Cap Fund are ₹92187 Cr.\n\nSources:\n- https://www.indmoney.com/mutual-funds/hdfc-mid-cap-fund-direct-plan-growth-option-3097",
+      "sources": [
+        "https://www.indmoney.com/mutual-funds/hdfc-mid-cap-fund-direct-plan-growth-option-3097"
+      ],
+      "error": null,
+      "response_time_ms": 302.4263381958008,
+      "metadata": {
+        "intent": "fund_fact",
+        "is_refusal": false,
+        "chunks_retrieved": 3
+      }
+    },
+    {
+      "test_name": "Advisory Refusal Test",
+      "passed": true,
+      "query": "Should I buy HDFC Flexi Cap Fund?",
+      "answer": "I'm a facts-only assistant and cannot provide opinions, personalized recommendations, or buy/sell advice.\n\nI can share objective details like NAV, past returns, expense ratio, and risk level. Deciding if a fund is right for you depends on your goals and risk profile.\n\nFor personalized guidance, please consult a SEBI-registered financial advisor or use official INDMoney tools.\n\nSources:\n- https://www.sebi.gov.in/sebiweb/other/OtherAction.do?doRecognisedFpi=yes&intmId=13 (SEBI Investor Education)\n",
+      "sources": [
+        "https://www.sebi.gov.in/sebiweb/other/OtherAction.do?doRecognisedFpi=yes&intmId=13"
+      ],
+      "error": null,
+      "response_time_ms": 0.027418136596679688,
+      "metadata": {
+        "intent": "opinion_advisory",
+        "is_refusal": true,
+        "chunks_retrieved": 0
+      }
+    },
+    {
+      "test_name": "Personal Query Refusal Test",
+      "passed": true,
+      "query": "What is my SIP amount?",
+      "answer": "I'm unable to help with personal or account-specific queries such as portfolio details, KYC status, or account information.\n\nFor assistance with your personal account, please:\n- Log in to your INDMoney account\n- Contact INDMoney support through the app\n- Or visit https://www.indmoney.com/support\n\nSources:\n- https://www.indmoney.com/support\n",
+      "sources": [
+        "https://www.sebi.gov.in/sebiweb/other/OtherAction.do?doRecognisedFpi=yes&intmId=13"
+      ],
+      "error": null,
+      "response_time_ms": 0.017881393432617188,
+      "metadata": {
+        "intent": "personal_account",
+        "is_refusal": true,
+        "chunks_retrieved": 0
+      }
+    }
+  ]
+}
