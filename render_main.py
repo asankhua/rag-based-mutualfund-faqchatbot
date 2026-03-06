@@ -45,25 +45,43 @@ def load_data():
     """Load pre-computed chunks and embeddings."""
     data_dir = PROJECT_ROOT / "data" / "phase2"
     
-    with open(data_dir / "chunks.json", "r") as f:
+    print(f"Loading data from: {data_dir}")
+    print(f"Data dir exists: {data_dir.exists()}")
+    
+    if not data_dir.exists():
+        raise FileNotFoundError(f"Data directory not found: {data_dir}")
+    
+    chunks_file = data_dir / "chunks.json"
+    metadata_file = data_dir / "metadata.json"
+    embeddings_file = data_dir / "embeddings.npy"
+    
+    print(f"chunks.json exists: {chunks_file.exists()}")
+    print(f"metadata.json exists: {metadata_file.exists()}")
+    print(f"embeddings.npy exists: {embeddings_file.exists()}")
+    
+    with open(chunks_file, "r") as f:
         chunk_objects = json.load(f)
     
-    with open(data_dir / "metadata.json", "r") as f:
+    with open(metadata_file, "r") as f:
         metadata = json.load(f)
     
-    embeddings = np.load(data_dir / "embeddings.npy")
+    embeddings = np.load(embeddings_file)
     
     # Extract text from chunk objects
     chunks = [chunk["text"] for chunk in chunk_objects if "text" in chunk]
+    
+    print(f"Loaded {len(chunks)} chunks, embeddings shape: {embeddings.shape}")
     
     return chunks, embeddings, metadata
 
 # Load data on startup
 try:
     CHUNKS, EMBEDDINGS, METADATA = load_data()
-    print(f"Loaded {len(CHUNKS)} chunks")
+    print(f"SUCCESS: Loaded {len(CHUNKS)} chunks")
 except Exception as e:
-    print(f"Error loading data: {e}")
+    print(f"ERROR loading data: {e}")
+    import traceback
+    traceback.print_exc()
     CHUNKS, EMBEDDINGS, METADATA = [], None, {}
 
 
@@ -88,56 +106,51 @@ def cosine_similarity(a, b):
 
 
 def retrieve_chunks(query: str, top_k: int = 5):
-    """Retrieve chunks using pre-computed embeddings with cosine similarity."""
-    if EMBEDDINGS is None or len(CHUNKS) == 0:
+    """Retrieve chunks using keyword matching."""
+    print(f"Retrieving chunks for query: '{query}'")
+    print(f"Total chunks available: {len(CHUNKS)}")
+    
+    if len(CHUNKS) == 0:
+        print("WARNING: No chunks loaded!")
         return []
     
-    # Simple keyword-based fallback for short queries
+    # Simple keyword-based matching
     query_lower = query.lower()
-    
-    # Calculate similarity scores using pre-computed embeddings
     scores = []
     
     for i, chunk in enumerate(CHUNKS):
         score = 0
         chunk_lower = chunk.lower()
         
-        # Keyword matching boost
+        # Keyword matching
         query_words = set(query_lower.split())
         chunk_words = set(chunk_lower.split())
         common_words = query_words & chunk_words
-        keyword_score = len(common_words) / max(len(query_words), 1)
+        score = len(common_words) / max(len(query_words), 1)
         
         # Boost for fund name matches
         fund_names = ["flexi cap", "small cap", "mid cap", "banking", "defence", 
-                      "nifty midcap", "private bank", "focused"]
+                      "nifty midcap", "private bank", "focused", "hdfc"]
         for fund in fund_names:
             if fund in query_lower and fund in chunk_lower:
-                keyword_score += 0.3
+                score += 0.5
         
         # Boost exact phrase matches
         if query_lower in chunk_lower:
-            keyword_score += 0.5
-        
-        # Use embedding similarity if available
-        if EMBEDDINGS is not None and i < len(EMBEDDINGS):
-            # For now, combine keyword score with a base score
-            # The embeddings were computed with sentence-transformers
-            score = keyword_score + 0.1  # Small boost for having embeddings
-        else:
-            score = keyword_score
+            score += 1.0
             
         scores.append((i, score))
     
     # Sort by score and return top_k
     scores.sort(key=lambda x: x[1], reverse=True)
-    top_indices = [idx for idx, score in scores[:top_k] if score > 0.05]
+    print(f"Top scores: {scores[:3]}")
     
-    # If no good matches, return top chunks anyway (for testing)
-    if not top_indices and len(CHUNKS) > 0:
-        top_indices = list(range(min(top_k, len(CHUNKS))))
+    # Return top_k chunks regardless of score (ensure we always have context)
+    top_indices = [idx for idx, _ in scores[:top_k]]
     
-    return [CHUNKS[i] for i in top_indices]
+    result = [CHUNKS[i] for i in top_indices]
+    print(f"Returning {len(result)} chunks")
+    return result
 
 
 @app.get("/", response_model=HealthResponse)
@@ -151,8 +164,12 @@ async def root():
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
+    # Check if data is loaded
+    data_loaded = len(CHUNKS) > 0 and EMBEDDINGS is not None
+    status = "healthy" if data_loaded else "unhealthy"
+    
     return HealthResponse(
-        status="healthy",
+        status=status,
         timestamp=datetime.utcnow().isoformat() + "Z",
         version="1.0.0"
     )
