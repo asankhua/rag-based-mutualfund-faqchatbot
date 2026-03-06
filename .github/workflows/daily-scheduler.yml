@@ -1,11 +1,10 @@
 name: Daily Data Update Scheduler
 
 on:
-  schedule:
-    # Run at 10:00 AM UTC daily
-    - cron: '0 10 * * *'
+  # Schedule disabled - enable when needed or run manually via workflow_dispatch
+  # schedule:
+  #   - cron: '0 10 * * *'
   
-  # Allow manual trigger
   workflow_dispatch:
 
 jobs:
