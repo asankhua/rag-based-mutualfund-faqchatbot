@@ -2,9 +2,7 @@
 
 **Tagline:** *Facts-Only Investment Information Assistant for HDFC Mutual Funds*
 
-**Author:** [Your Name]  
-**Date:** [Date]  
-**Status:** [Draft / In Review / Complete]
+**Author:** Ashish Kumar Sankhua | Product Manager  | **Date:** March 27, 2026 | **Status:** Production Ready
 
 ---
 
