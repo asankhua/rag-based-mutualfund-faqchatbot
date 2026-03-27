@@ -1,8 +1,8 @@
-# Product Case Study: RAG-Based Mutual Fund FAQ Chatbot
+**RAG-Based Mutual Fund FAQ Chatbot**  
+*Facts-Only Investment Information Assistant for HDFC Mutual Funds*
 
-**Tagline:** *Facts-Only Investment Information Assistant for HDFC Mutual Funds*
-
-**Author:** Ashish Kumar Sankhua | Product Manager  | **Date:** March 27, 2026 | **Status:** Production Ready
+**Author:** Ashish Kumar Sankhua | Product Manager  
+**Date:** March 2026 | **Status:** Production Ready
 
 ---
 
