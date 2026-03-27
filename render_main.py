@@ -231,8 +231,14 @@ def get_scheduler_metadata():
 @app.get("/status")
 async def get_status():
     data_dir = PROJECT_ROOT / "data" / "phase1"
+    phase2_dir = PROJECT_ROOT / "data" / "phase2"
     total_funds = 0
     last_data_update = None
+    
+    # Check data directories
+    phase1_exists = data_dir.exists()
+    phase2_exists = phase2_dir.exists()
+    chunks_loaded = len(CHUNKS)
     
     if data_dir.exists():
         scrape_times = []
@@ -258,8 +264,12 @@ async def get_status():
     display_last_updated = last_scheduler_run or last_data_update
     
     return {
-        "status": "healthy",
+        "status": "healthy" if chunks_loaded > 0 else "unhealthy",
         "total_funds": total_funds,
+        "chunks_loaded": chunks_loaded,
+        "phase1_exists": phase1_exists,
+        "phase2_exists": phase2_exists,
+        "project_root": str(PROJECT_ROOT),
         "last_updated": display_last_updated,
         "last_scheduler_run": last_scheduler_run,
         "last_data_update": last_data_update,
@@ -303,14 +313,19 @@ async def get_fund(scheme_id: str):
 @app.post("/chat/query")
 async def chat_query(request: ChatQueryRequest):
     try:
+        # Check if chunks are loaded
+        if len(CHUNKS) == 0:
+            return ChatQueryResponse(
+                answer="Error: No data loaded. Please check the backend configuration.",
+                sources=[]
+            )
+        
         # Retrieve relevant chunks
         relevant_chunks = retrieve_chunks(request.message)
         
+        # If no relevant chunks found, use first 3 chunks as fallback
         if not relevant_chunks:
-            return ChatQueryResponse(
-                answer="I don't have specific information about that in my knowledge base. Please ask about one of the available HDFC mutual funds.",
-                sources=[]
-            )
+            relevant_chunks = CHUNKS[:3]
         
         # Build context
         context = "\n\n".join(relevant_chunks)
